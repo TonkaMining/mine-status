@@ -1,0 +1,19 @@
+{
+  "name": "mine-status",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "setup-env": "node ./scripts/createDevelopmentEnvFile",
+    "start": "node ./index.js"
+  },
+  "author": "Nate Geslin <ngeslin@nerdery.com>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.4",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.11.7"
+  }
+}
