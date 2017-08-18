@@ -5,6 +5,7 @@ const dotenv = require('dotenv').load();
 
 const minerRoutes = require('./routes/miner.routes');
 const workerRoutes = require('./routes/worker.routes');
+const gpuRoutes = require('./routes/gpu.routes');
 
 const mongoUri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3006;
@@ -23,10 +24,11 @@ mongoose.connect(mongoUri, { useMongoClient: true }, (err, res) => {
 
 const app = express();
 
-app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use('/api', minerRoutes);
 app.use('/api', workerRoutes);
+app.use('/api', gpuRoutes);
 
 app.listen(PORT, (error) => {
     if (error) {

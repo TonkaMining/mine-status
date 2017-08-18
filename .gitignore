@@ -3,4 +3,4 @@
 .dev-env
 .env
 node_modules/
-
+npm-debug.*
