@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const GpuController = require('../controllers/gpu.controller');
+const GpuController = require('./gpu.controller');
 
 router.route('/gpu').get(GpuController.getGpuList);
 router.route('/gpu/:id').get(GpuController.getGpu);

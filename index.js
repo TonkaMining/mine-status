@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv').load();
 
-const minerRoutes = require('./routes/miner.routes');
-const workerRoutes = require('./routes/worker.routes');
-const gpuRoutes = require('./routes/gpu.routes');
+const minerRoutes = require('./miner/miner.routes');
+const workerRoutes = require('./worker/worker.routes');
+const gpuRoutes = require('./gpu/gpu.routes');
 
 const mongoUri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3006;

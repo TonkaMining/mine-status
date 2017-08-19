@@ -1,4 +1,4 @@
-const GpuModel = require('../models/GpuModel');
+const GpuModel = require('./gpu.model');
 
 function getGpuList(req, res) {
     GpuModel.find().sort('name').exec((error, gpuList) => {

@@ -1,4 +1,4 @@
-const Miner = require('../models/MinerModel');
+const Miner = require('./miner.model');
 
 function getMinerStats(req, res) {
     Miner.find().sort('time').exec((error, minerList) => {
