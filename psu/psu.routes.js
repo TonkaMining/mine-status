@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
 const PsuController = require('./psu.controller');
+
+const router = express.Router();
 
 router.route('/psu').get(PsuController.getPsuList);
 router.route('/psu/:id').get(PsuController.getPsu);

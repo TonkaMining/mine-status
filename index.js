@@ -7,6 +7,7 @@ const minerRoutes = require('./miner/miner.routes');
 const workerRoutes = require('./worker/worker.routes');
 const gpuRoutes = require('./gpu/gpu.routes');
 const psuRoutes = require('./psu/psu.routes');
+const rigRoutes = require('./rig/rig.routes');
 
 const mongoUri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3006;
@@ -31,6 +32,7 @@ app.use('/api', minerRoutes);
 app.use('/api', workerRoutes);
 app.use('/api', gpuRoutes);
 app.use('/api', psuRoutes);
+app.use('/api', rigRoutes);
 
 app.listen(PORT, (error) => {
     if (error) {
