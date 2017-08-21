@@ -6,6 +6,7 @@ const dotenv = require('dotenv').load();
 const minerRoutes = require('./miner/miner.routes');
 const workerRoutes = require('./worker/worker.routes');
 const gpuRoutes = require('./gpu/gpu.routes');
+const psuRoutes = require('./psu/psu.routes');
 
 const mongoUri = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3006;
@@ -29,6 +30,7 @@ app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use('/api', minerRoutes);
 app.use('/api', workerRoutes);
 app.use('/api', gpuRoutes);
+app.use('/api', psuRoutes);
 
 app.listen(PORT, (error) => {
     if (error) {
