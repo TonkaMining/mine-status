@@ -1,45 +1,24 @@
+const BaseController = require('../base/base.contoller');
 const GpuModel = require('./gpu.model');
 
 function getGpuList(req, res) {
-    GpuModel.find().sort('name').exec((error, gpuList) => {
-        if (error) {
-            res.status(500).send(error);
-        }
-
-        res.json({ gpuList });
-    });
+    return BaseController.getItemlist(req, res, GpuModel, 'gpuList');
 }
 
 function createGpu(req, res) {
-    const gpuModelToSave = new GpuModel(req.body);
-
-    gpuModelToSave.save()
-        .then((record) => res.status(200).send(record))
-        .catch((error) => res.status(500).send(error));
+    return BaseController.createItem(req, res, GpuModel);
 }
 
 function getGpu(req, res) {
-    GpuModel.findById(req.params.id)
-        .then((gpu) => res.status(200).json(gpu))
-        .catch((error) => res.status(500).send(error));
+    return BaseController.getItem(req, res, GpuModel);
 }
 
 function updateGpu(req, res) {
-    GpuModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
-        .then((gpu) => res.status(200).json(gpu))
-        .catch((error) => res.status(500).send(error));
+    return BaseController.updateItem(req, res, GpuModel);
 }
 
 function deleteGpu(req, res) {
-    GpuModel.findOne({ _id: req.params.id }).exec((error, gpu) => {
-        if (error) {
-            res.status(500).send(error);
-        }
-
-        gpu.remove(() => {
-            res.status(200).end();
-        });
-    });
+    return BaseController.deleteItem(req, res, GpuModel);
 }
 
 module.exports = {

@@ -1,51 +1,30 @@
+const BaseController = require('../base/base.contoller');
 const PsuModel = require('./psu.model');
 
-function getGpuList(req, res) {
-    PsuModel.find().sort('name').exec((error, psuList) => {
-        if (error) {
-            res.status(500).send(error);
-        }
-
-        res.json({ psuList });
-    });
+function getPsuList(req, res) {
+    return BaseController.getItemlist(req, res, PsuModel, 'psuList');
 }
 
-function createGpu(req, res) {
-    const psuModelToSave = new PsuModel(req.body);
-
-    psuModelToSave.save()
-        .then((record) => res.status(200).send(record))
-        .catch((error) => res.status(500).send(error));
+function createPsu(req, res) {
+    return BaseController.createItem(req, res, PsuModel);
 }
 
-function getGpu(req, res) {
-    PsuModel.findById(req.params.id)
-        .then((psu) => res.status(200).json(psu))
-        .catch((error) => res.status(500).send(error));
+function getPsu(req, res) {
+    return BaseController.getItem(req, res, PsuModel);
 }
 
-function updateGpu(req, res) {
-    PsuModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
-        .then((psu) => res.status(200).json(psu))
-        .catch((error) => res.status(500).send(error));
+function updatePsu(req, res) {
+    return BaseController.updateItem(req, res, PsuModel);
 }
 
-function deleteGpu(req, res) {
-    PsuModel.findOne({ _id: req.params.id }).exec((error, psu) => {
-        if (error) {
-            res.status(500).send(error);
-        }
-
-        psu.remove(() => {
-            res.status(200).end();
-        });
-    });
+function deletePsu(req, res) {
+    return BaseController.deleteItem(req, res, PsuModel);
 }
 
 module.exports = {
-    getGpuList: getGpuList,
-    createGpu: createGpu,
-    getGpu: getGpu,
-    updateGpu: updateGpu,
-    deleteGpu: deleteGpu
+    getPsuList: getPsuList,
+    createPsu: createPsu,
+    getPsu: getPsu,
+    updatePsu: updatePsu,
+    deletePsu: deletePsu
 };
