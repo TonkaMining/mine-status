@@ -1,3 +1,4 @@
+const BaseController = require('../base/base.contoller');
 const RigStatModel = require('./rigStat.model');
 
 /**
@@ -54,6 +55,11 @@ function saveRigStat(response) {
         });
 }
 
+function getRigStatList(req, res) {
+    return BaseController.getItemlist(req, res, RigStatModel, 'rigStatList');
+}
+
 module.exports = {
+    getRigStatList: getRigStatList,
     saveRigStat: saveRigStat
 };
