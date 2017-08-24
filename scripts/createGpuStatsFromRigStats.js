@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const _map = require('lodash').map;
 const RigStatModel = require('../rigStat/rigStat.model');
+const gpuStatItemSchema = require('../gpuStat/gpuStatItem.schema');
 const GpuModel = require('../gpu/gpu.model');
 const GpuStatModel = require('../gpuStat/gpuStat.model');
 
@@ -21,8 +22,8 @@ mongoose.connect(mongoUri, { useMongoClient: true }, (err, res) => {
     console.log (`Successfully connected to: ${mongoUri}`);
 });
 
-function createGpuStatModelFromRigStatAndGpuModel(rigStatProps, gpuModel) {
-    const gpuStatModel = new GpuStatModel();
+function createGpuStatPropsFromRigStatAndGpuModel(rigStatProps, gpuModel) {
+    const gpuStatModel = {};
 
     gpuStatModel.time = rigStatProps.time;
     gpuStatModel.hashRate = rigStatProps.hashRate;
@@ -38,9 +39,18 @@ function createGpuStatModelFromRigStatAndGpuModel(rigStatProps, gpuModel) {
 function generateGpuStatModelList(rigStatModelList, gpuList) {
     const gpuStatModelList = [];
 
+    if (rigStatModelList.length === 0 || gpuList.length === 0) {
+        return;
+    }
+
     for (let i = 0; i < rigStatModelList.length; i++) {
-        const rigStatModel = new RigStatModel(rigStatModelList[0]);
+        const rigStatModel = new RigStatModel(rigStatModelList[i]);
         const translatedRigStatModel = rigStatModel.translateToGpuStatProps();
+        const gpuStatModel = new GpuStatModel({
+            time: rigStatModel.time,
+            rig: gpuList[0].name,
+            items: []
+        });
 
         if (translatedRigStatModel.length !== gpuList.length) {
             throw Error(`Model length mismatch. translatedRigStatModel: ${translatedRigStatModel.length} does not ` +
@@ -49,10 +59,12 @@ function generateGpuStatModelList(rigStatModelList, gpuList) {
 
         for (let j = 0; j < gpuList.length; j++) {
             const gpuModel = gpuList[j];
-            const gpuStatModel = createGpuStatModelFromRigStatAndGpuModel(translatedRigStatModel[j], gpuModel);
+            const gpuStatProps = createGpuStatPropsFromRigStatAndGpuModel(translatedRigStatModel[j], gpuModel);
 
-            gpuStatModelList.push(gpuStatModel);
+            gpuStatModel.items.push(gpuStatProps);
         }
+
+        gpuStatModelList.push(gpuStatModel);
     }
 
     return gpuStatModelList;
