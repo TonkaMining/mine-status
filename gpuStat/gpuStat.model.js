@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const gpuStatSchema = Schema({
-    time: { type: Date, default: Date.now },
+    time: Number,
     cardId: String,
     hashRate: Number,
     temperature: Number,

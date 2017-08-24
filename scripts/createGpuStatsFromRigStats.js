@@ -1,6 +1,7 @@
 const dotenv = require('dotenv').load();
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
+const _map = require('lodash').map;
 const RigStatModel = require('../rigStat/rigStat.model');
 const GpuModel = require('../gpu/gpu.model');
 const GpuStatModel = require('../gpuStat/gpuStat.model');
@@ -20,11 +21,65 @@ mongoose.connect(mongoUri, { useMongoClient: true }, (err, res) => {
     console.log (`Successfully connected to: ${mongoUri}`);
 });
 
+function createGpuStatModelFromRigStatAndGpuModel(rigStatProps, gpuModel) {
+    const gpuStatModel = new GpuStatModel();
+
+    gpuStatModel.time = rigStatProps.time;
+    gpuStatModel.hashRate = rigStatProps.hashRate;
+    gpuStatModel.temperature = rigStatProps.temp;
+    gpuStatModel.fanSpeed = rigStatProps.fanSpeed;
+    gpuStatModel.cardId = gpuModel.cardId;
+    gpuStatModel.rigPosition = gpuModel.rigPosition;
+    gpuStatModel.rigName = gpuModel.rig;
+
+    return gpuStatModel;
+}
+
+function generateGpuStatModelList(rigStatModelList, gpuList) {
+    const gpuStatModelList = [];
+
+    for (let i = 0; i < rigStatModelList.length; i++) {
+        const rigStatModel = new RigStatModel(rigStatModelList[0]);
+        const translatedRigStatModel = rigStatModel.translateToGpuStatProps();
+
+        if (translatedRigStatModel.length !== gpuList.length) {
+            throw Error(`Model length mismatch. translatedRigStatModel: ${translatedRigStatModel.length} does not ` +
+                `contain the same number or elements as gpuList: ${gpuList.length}`);
+        }
+
+        for (let j = 0; j < gpuList.length; j++) {
+            const gpuModel = gpuList[j];
+            const gpuStatModel = createGpuStatModelFromRigStatAndGpuModel(translatedRigStatModel[j], gpuModel);
+
+            gpuStatModelList.push(gpuStatModel);
+        }
+    }
+
+    return gpuStatModelList;
+}
+
+function saveGpuStatModelList(gpuStatModelList) {
+    _map(gpuStatModelList, (gpuStatModel) => {
+        return new Promise((resolve, reject) => {
+            gpuStatModel.save((error, model) => {
+                if (error) {
+                    console.error('\n::: ERROR', error);
+
+                    return reject(error);
+                }
+
+                return resolve(model);
+            });
+        });
+    });
+}
+
 function assembleRigStatsForGpuStatHydration() {
     let gpuList;
     let lastGpuStatRecordTime;
     let lastGpuStatRecordUnixTimestamp;
     let rigStatModelList;
+    let gpuStatModelList;
 
     return new Promise((resolve, reject) => {
         return GpuModel.find().exec()
@@ -34,7 +89,7 @@ function assembleRigStatsForGpuStatHydration() {
                 return GpuStatModel.find().limit(1).sort({ time: -1 }).exec()
             })
             .then((gpuStatResponse) => {
-                lastGpuStatRecordTime = gpuStatResponse[0].time;
+                lastGpuStatRecordTime = gpuStatResponse.length > 0 ? gpuStatResponse[0].time : 0;
                 lastGpuStatRecordUnixTimestamp = Math.round(new Date(lastGpuStatRecordTime).getTime() / 1000);
 
                 if (gpuStatResponse.length === 0) {
@@ -45,22 +100,22 @@ function assembleRigStatsForGpuStatHydration() {
             })
             .then((rigStatModelListResponse) => {
                 rigStatModelList = rigStatModelListResponse;
+                gpuStatModelList = generateGpuStatModelList(rigStatModelList, gpuList);
 
-                console.log('---', gpuList.length);
-                console.log('---', lastGpuStatRecordUnixTimestamp);
-                console.log('--- rigStatModelList', rigStatModelList.length);
-                console.log('::: rigStatModelList[0]', rigStatModelList[0]);
-
-                mongoose.disconnect();
+                return resolve(Promise.all(saveGpuStatModelList(gpuStatModelList)));
             })
             .catch((error) => {
-                console.error('::: Error', error);
-
-                mongoose.disconnect();
-
-                throw error;
+                return reject(error);
             });
     });
 };
 
-assembleRigStatsForGpuStatHydration();
+assembleRigStatsForGpuStatHydration()
+    .then(() => {
+        mongoose.disconnect();
+    })
+    .catch((error) => {
+        console.error('::: Error', error);
+
+        throw error;
+    });
