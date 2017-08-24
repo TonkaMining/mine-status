@@ -12,7 +12,7 @@ const rigStatSchema = Schema({
     gpuTempsAndFanSpeeds: String,
     pools: String,
     invalidSharesAndPoolSwitches: String
-});
+}, { collection: 'rigstatmodels' });
 
 const RigStatModel = mongoose.model('RigStatModel', rigStatSchema);
 

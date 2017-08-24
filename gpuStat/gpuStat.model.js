@@ -9,7 +9,7 @@ const gpuStatSchema = Schema({
     fanSpeed: Number,
     rigPosition: Number,
     rigName: String
-}, { collection: 'gpuStats'});
+}, { collection: 'gpustats'});
 
 const GpuStatModel = mongoose.model('GpuStatModel', gpuStatSchema);
 

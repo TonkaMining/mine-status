@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "setup-env": "node ./scripts/createDevelopmentEnvFile",
-    "start": "node ./index.js"
+    "start": "node ./index.js",
+    "gpuStats": "node ./scripts/createGpuStatsFromRigStats.js"
   },
   "author": "Nate Geslin <ngeslin@nerdery.com>",
   "license": "ISC",
