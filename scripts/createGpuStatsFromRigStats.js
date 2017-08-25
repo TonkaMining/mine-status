@@ -70,13 +70,20 @@ function generateGpuStatModelList(rigStatModelList, gpuList) {
     return gpuStatModelList;
 }
 
+/**
+ *
+ * @param {*} gpuStatModelList
+ * @return {Promise}
+ */
 function saveGpuStatModelList(gpuStatModelList) {
-    _map(gpuStatModelList, (gpuStatModel) => {
+    if (!gpuStatModelList || gpuStatModelList.length === 0) {
+        return Promise.reject('No Items to Save');
+    }
+
+    const modelListToSave = _map(gpuStatModelList, (gpuStatModel) => {
         return new Promise((resolve, reject) => {
             gpuStatModel.save((error, model) => {
                 if (error) {
-                    console.error('\n::: ERROR', error);
-
                     return reject(error);
                 }
 
@@ -84,8 +91,13 @@ function saveGpuStatModelList(gpuStatModelList) {
             });
         });
     });
+
+    return Promise.all(modelListToSave);
 }
 
+/**
+ * @return {Promise}
+ */
 function assembleRigStatsForGpuStatHydration() {
     let gpuList;
     let lastGpuStatRecordTime;
@@ -114,7 +126,7 @@ function assembleRigStatsForGpuStatHydration() {
                 rigStatModelList = rigStatModelListResponse;
                 gpuStatModelList = generateGpuStatModelList(rigStatModelList, gpuList);
 
-                return resolve(Promise.all(saveGpuStatModelList(gpuStatModelList)));
+                return resolve(saveGpuStatModelList(gpuStatModelList));
             })
             .catch((error) => {
                 return reject(error);
@@ -127,7 +139,7 @@ assembleRigStatsForGpuStatHydration()
         mongoose.disconnect();
     })
     .catch((error) => {
-        console.error('::: Error', error);
+        console.error('\n::: Error', error.message);
 
         throw error;
     });
