@@ -1,6 +1,7 @@
 const dotenv = require('dotenv').load();
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
+const _filter = require('lodash').filter;
 const _map = require('lodash').map;
 const RigStatModel = require('../rigStat/rigStat.model');
 const gpuStatItemSchema = require('../gpuStat/gpuStatItem.schema');
@@ -45,6 +46,7 @@ function generateGpuStatModelList(rigStatModelList, gpuList) {
 
     for (let i = 0; i < rigStatModelList.length; i++) {
         const rigStatModel = new RigStatModel(rigStatModelList[i]);
+        const gpuListForRig = _filter(gpuList, (gpu) => gpu.rig === rigStatModel.rig);
         const translatedRigStatModel = rigStatModel.translateToGpuStatProps();
         const gpuStatModel = new GpuStatModel({
             time: rigStatModel.time,
@@ -52,13 +54,13 @@ function generateGpuStatModelList(rigStatModelList, gpuList) {
             items: []
         });
 
-        if (translatedRigStatModel.length !== gpuList.length) {
+        if (translatedRigStatModel.length !== gpuListForRig.length) {
             throw Error(`Model length mismatch. translatedRigStatModel: ${translatedRigStatModel.length} does not ` +
-                `contain the same number or elements as gpuList: ${gpuList.length}`);
+                `contain the same number of elements as gpuList: ${gpuList.length}`);
         }
 
-        for (let j = 0; j < gpuList.length; j++) {
-            const gpuModel = gpuList[j];
+        for (let j = 0; j < gpuListForRig.length; j++) {
+            const gpuModel = gpuListForRig[j];
             const gpuStatProps = createGpuStatPropsFromRigStatAndGpuModel(translatedRigStatModel[j], gpuModel);
 
             gpuStatModel.items.push(gpuStatProps);
