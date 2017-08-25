@@ -1,5 +1,5 @@
 function getItemlist(req, res, Model, listKey) {
-    Model.find().exec((error, itemList) => {
+    return Model.find().exec((error, itemList) => {
         if (error) {
             res.status(500).send(error);
         }
@@ -13,30 +13,30 @@ function getItemlist(req, res, Model, listKey) {
 function createItem(req, res, Model) {
     const modelToSave = new Model(req.body);
 
-    modelToSave.save()
+    return modelToSave.save()
         .then((item) => res.status(200).send(item))
         .catch((error) => res.status(500).send(error));
 }
 
 function getItem(req, res, Model) {
-    Model.findById(req.params.id)
+    return Model.findById(req.params.id)
         .then((item) => res.status(200).json(item))
         .catch((error) => res.status(500).send(error));
 }
 
 function updateItem(req, res, Model) {
-    Model.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
+    return Model.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec()
         .then((item) => res.status(200).json(item))
         .catch((error) => res.status(500).send(error));
 }
 
 function deleteItem(req, res, Model) {
-    Model.findOne({ _id: req.params.id }).exec((error, item) => {
+    return Model.findOne({ _id: req.params.id }).exec((error, item) => {
         if (error) {
             res.status(500).send(error);
         }
 
-        item.remove(() => {
+        return item.remove(() => {
             res.status(200).end();
         });
     });

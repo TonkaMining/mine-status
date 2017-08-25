@@ -6,6 +6,7 @@ const dotenv = require('dotenv').load();
 const minerRoutes = require('./miner/miner.routes');
 const workerRoutes = require('./worker/worker.routes');
 const gpuRoutes = require('./gpu/gpu.routes');
+const gpuStatRoutes = require('./gpuStat/gpuStat.routes');
 const psuRoutes = require('./psu/psu.routes');
 const rigRoutes = require('./rig/rig.routes');
 const rigStatRoutes = require('./rigStat/rigStat.routes');
@@ -35,6 +36,7 @@ app.use('/api', gpuRoutes);
 app.use('/api', psuRoutes);
 app.use('/api', rigRoutes);
 app.use('/api', rigStatRoutes);
+app.use('/api', gpuStatRoutes);
 
 app.listen(PORT, (error) => {
     if (error) {
