@@ -1,5 +1,5 @@
 function getItemlist(req, res, Model, listKey) {
-    Model.find().sort('name').exec((error, itemList) => {
+    Model.find().exec((error, itemList) => {
         if (error) {
             res.status(500).send(error);
         }

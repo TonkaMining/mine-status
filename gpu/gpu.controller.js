@@ -2,7 +2,13 @@ const BaseController = require('../base/base.contoller');
 const GpuModel = require('./gpu.model');
 
 function getGpuList(req, res) {
-    return BaseController.getItemlist(req, res, GpuModel, 'gpuList');
+    GpuModel.find('rig rigPosition').exec((error, gpuList) => {
+        if (error) {
+            res.status(500).send(error);
+        }
+
+        res.json({ gpuList });
+    });
 }
 
 function createGpu(req, res) {
