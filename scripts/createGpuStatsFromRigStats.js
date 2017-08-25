@@ -48,7 +48,7 @@ function generateGpuStatModelList(rigStatModelList, gpuList) {
         const translatedRigStatModel = rigStatModel.translateToGpuStatProps();
         const gpuStatModel = new GpuStatModel({
             time: rigStatModel.time,
-            rig: gpuList[0].name,
+            rig: rigStatModel.rig,
             items: []
         });
 
